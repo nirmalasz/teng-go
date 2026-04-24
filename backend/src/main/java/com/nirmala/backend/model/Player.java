@@ -76,5 +76,22 @@ public class Player {
 
     public void setHighestLevelReached(Integer highestLevelReached) {
         this.highestLevelReached = highestLevelReached;
-     }
+    }
+
+    //business methods
+    public void updateHighScore(Integer newScore){
+        if (this.highScore < newScore ){
+            this.highScore = newScore;
+        }
+    }
+
+    public void updateHighestLevelReached(Integer newLevel){
+        if (this.highestLevelReached < newLevel){
+            this.highestLevelReached = newLevel;
+        }
+    }
+
+    public void addCoins(Integer addedCoins){
+        this.totalCoins += addedCoins;
+    }
 }

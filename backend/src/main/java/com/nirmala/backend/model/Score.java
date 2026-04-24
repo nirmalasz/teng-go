@@ -26,8 +26,8 @@ public class Score {
     @Column(name = "coins_collected")
     private Integer coinsCollected = 0;
 
-    @Column(name = "stage_reached")
-    private Integer stageReached = 0;
+    @Column(name = "level_reached")
+    private Integer levelReached = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -37,11 +37,11 @@ public class Score {
     public Score(){}
 
     //constructor w required fields
-    public Score(UUID playerId, Integer value, Integer coinsCollected, Integer stageReached){
+    public Score(UUID playerId, Integer value, Integer coinsCollected, Integer levelReached){
         this.playerId = playerId;
         this.value = value;
         this.coinsCollected = coinsCollected;
-        this.stageReached = stageReached;
+        this.levelReached = levelReached;
     }
 
     //getter n setters
@@ -87,11 +87,11 @@ public class Score {
         this.coinsCollected = coinsCollected;
     }
 
-    public Integer getStageReached() {
-        return stageReached;
+    public Integer getLevelReached() {
+        return levelReached;
     }
 
-    public void setStageReached(Integer stageReached) {
-        this.stageReached = stageReached;
+    public void setLevelReached(Integer levelReached) {
+        this.levelReached = levelReached;
     }
 }
