@@ -3,11 +3,13 @@ package com.tenggo.frontend.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.tenggo.frontend.states.GameState;
+import com.tenggo.frontend.states.MenuState;
 
 public class GameManager {
     private static GameManager instance;
     private boolean gameActive;
-    // private GameState currentState;
+    private GameState currentState;
     // private LevelManager levelManager;
     private BackendService backendService;
     private String currentPlayerId;
@@ -24,6 +26,26 @@ public class GameManager {
             instance = new GameManager();
         }
         return instance;
+    }
+
+    public void changeState(GameState newState){
+        if (currentState != null){
+            currentState.exit();
+        }
+        currentState = newState;
+        currentState.enter();
+    }
+
+    public void update(float delta){
+        if (currentState != null){
+            currentState.update(delta);
+        }
+    }
+
+    public void render(){
+        if (currentState != null){
+            currentState.render();
+        }
     }
 
     public void registerPlayer(String username){

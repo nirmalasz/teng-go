@@ -1,4 +1,5 @@
 package com.tenggo.frontend.observer;
 
-public class Observer {
+public interface Observer {
+    void update(int hp);
 }
