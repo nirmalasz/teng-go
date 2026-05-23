@@ -108,4 +108,13 @@ public class Enemy {
     public boolean isDead() {
         return hp <= 0;
     }
+
+    public void setX(float x) {
+        position.x = x;
+        hitbox.setPosition(position.x, position.y);
+    }
+    public void setY(float y) {
+        position.y = y;
+        hitbox.setPosition(position.x, position.y);
+    }
 }

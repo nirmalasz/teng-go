@@ -3,112 +3,101 @@ package com.tenggo.frontend.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 import com.tenggo.frontend.TengGoGame;
 import com.tenggo.frontend.core.GameManager;
-import com.tenggo.frontend.states.DeadState;
+import com.tenggo.frontend.states.AchievementState;
+import com.tenggo.frontend.ui.BackgroundRenderer;
 
-public class DeathScreen implements Screen {
-
+public class AchievementScreen implements Screen {
     private final TengGoGame game;
     private final Stage stage;
     private final SpriteBatch batch;
-    private final Texture backgroundTexture;
 
-    public DeathScreen(TengGoGame game) {
-
+    public AchievementScreen(TengGoGame game) {
         this.game = game;
         this.stage = new Stage(new ScreenViewport());
 
+        GameManager.getInstance().changeState(new AchievementState());
         batch = new SpriteBatch();
-        backgroundTexture = new Texture("bg-tenggo-office-red.png");
-
-        GameManager.getInstance()
-            .changeState(new DeadState(this));
-
         Gdx.input.setInputProcessor(stage);
 
         Skin skin = new Skin(Gdx.files.internal("ui/metal-ui.json"));
 
         Table table = new Table();
+
         table.setFillParent(true);
 
-        Label deadLabel =
-            new Label("YOU DIED", skin);
+        table.row();
 
-        TextButton retryButton =
-            new TextButton("Retry", skin);
+        Window achievementWindow = new Window("Achievement List", skin);
+        achievementWindow.add(new Label("First Blood [LOCKED]", skin))
+            .padBottom(15);;
+        achievementWindow.row();
+        achievementWindow.add(new Label("Karl Marx Chosen [LOCKED]", skin))
+            .padBottom(15);
 
-        TextButton exitButton =
-            new TextButton("Exit", skin);
+        achievementWindow.row();
+        achievementWindow.add(new Label("Defeat 10 Enemies [LOCKED]", skin))
+            .padBottom(15);;
+        achievementWindow.row();
+        achievementWindow.add(new Label("Fisrt Blood [LOCKED]", skin))
+            .padBottom(15);;
+        achievementWindow.row();
+        achievementWindow.pack();
 
-        retryButton.addListener(event -> {
 
-            if (!retryButton.isPressed()) return false;
+
+
+        TextButton backButton = new TextButton("Back",skin);
+
+        backButton.addListener(event -> {
+            if (!backButton.isPressed()) {
+                return false;
+            }
 
             Screen currentScreen = game.getScreen();
             game.setScreen(new PreparationScreen(game));
-            if(currentScreen != null) {
+            if(currentScreen!=null) {
                 currentScreen.dispose();
             }
-            return true;
-        });
-
-        exitButton.addListener(event -> {
-
-            if (!exitButton.isPressed()) return false;
-
-            Gdx.app.exit();
 
             return true;
         });
-
-        table.add(deadLabel).padBottom(110);
+        table.add(achievementWindow).padBottom(30);
         table.row();
-
-        table.add(retryButton)
-            .width(200)
-            .padBottom(10);
-
-        table.row();
-
-        table.add(exitButton)
-            .width(200);
-
+        table.add(backButton).width(200);
         stage.addActor(table);
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.3f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.end();
-
+        BackgroundRenderer.render(batch);
         GameManager.getInstance().update(delta);
-
         stage.act(delta);
         stage.draw();
     }
 
-    @Override public void resize(int width, int height) {
+    @Override
+    public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }
 
     @Override public void show() {}
+
     @Override public void hide() {}
+
     @Override public void pause() {}
+
     @Override public void resume() {}
 
     @Override
     public void dispose() {
         stage.dispose();
-        batch.dispose();
-        backgroundTexture.dispose();
     }
 }

@@ -13,7 +13,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/player-achievements")
 @CrossOrigin(origins = "*")
-public class PlayerAchievementController {
+public class    PlayerAchievementController {
     @Autowired
     private PlayerAchievementService playerAchievementService;
 
