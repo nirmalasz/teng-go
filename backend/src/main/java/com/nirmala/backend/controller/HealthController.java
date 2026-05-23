@@ -34,6 +34,7 @@ public class HealthController {
         endpoints.put("players", "/player");
         endpoints.put("scores", "/scores");
         endpoints.put("leaderboard", "/leaderboard");
+        endpoints.put("achievements", "/achievements");
         endpoints.put("health", "/health");
 
         utama.put("endpoints", endpoints);
