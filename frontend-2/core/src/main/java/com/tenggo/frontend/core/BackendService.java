@@ -8,7 +8,7 @@ import com.badlogic.gdx.net.HttpRequestBuilder;
 import java.util.UUID;
 
 public class BackendService {
-    private static final String BASE_URL = "http://localhost:8080/api";
+    private static final String BASE_URL = "https://resilient-dream-production-df2c.up.railway.app/api";
     private UUID currentPlayerId;
 
     public interface RequestCallback {
