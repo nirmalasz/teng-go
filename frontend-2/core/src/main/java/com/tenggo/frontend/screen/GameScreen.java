@@ -62,6 +62,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         System.out.println("Gameplay Started");
+        GameManager.getInstance().getBGMManager().play("battlemusic", true, "ogg");
         shapeRenderer = new ShapeRenderer();
 
         batch = new SpriteBatch();

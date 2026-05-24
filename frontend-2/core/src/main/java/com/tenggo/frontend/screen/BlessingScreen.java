@@ -119,7 +119,9 @@ public class BlessingScreen implements Screen {
         stageUI.draw();
     }
 
-    @Override public void show() {}
+    @Override public void show() {
+        GameManager.getInstance().getBGMManager().play("blessing", true, "mp3");
+    }
 
     @Override
     public void resize(int width, int height) {

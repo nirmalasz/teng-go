@@ -102,7 +102,9 @@ public class WinScreen implements Screen {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void show() {}
+    @Override public void show() {
+        GameManager.getInstance().getBGMManager().play("winnerjingle", false, "mp3");
+    }
 
     @Override public void hide() {}
 

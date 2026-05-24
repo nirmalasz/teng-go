@@ -100,7 +100,9 @@ public class DeathScreen implements Screen {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void show() {}
+    @Override public void show() {
+        GameManager.getInstance().getBGMManager().play("losejingle", false, "mp3");
+    }
     @Override public void hide() {}
     @Override public void pause() {}
     @Override public void resume() {}

@@ -73,8 +73,26 @@ public class Enemy {
     }
 
     public void move(float dx,float dy,Player player,Array<Enemy> enemies) {
-        float nextX = position.x + dx;
-        float nextY = position.y + dy;
+        Vector2 separation = new Vector2(0, 0);
+        float preferredDistance = 30f;
+
+        for (int i = 0; i < enemies.size; i++) {
+            Enemy other = enemies.get(i);
+            if (other == this) continue;
+
+            Vector2 diff = new Vector2(position.x - other.getPosition().x, position.y - other.getPosition().y);
+            float distance = diff.len();
+
+            if (distance < preferredDistance && distance > 0.01f) {
+                diff.nor();
+
+                float pushStrength = (preferredDistance - distance) * 0.1f;
+                separation.add(diff.scl(pushStrength));
+            }
+        }
+
+        float nextX = position.x + dx + separation.x;
+        float nextY = position.y + dy + separation.y;
 
         Rectangle futureHitbox =
             new Rectangle(
@@ -84,17 +102,7 @@ public class Enemy {
                 height
             );
 
-        boolean colliding = false;
-        for (int i = 0; i < enemies.size; i++) {
-            Enemy enemy = enemies.get(i);
-            if (enemy == this) continue;
-            if (futureHitbox.overlaps(enemy.getHitbox())) {
-                colliding = true;
-                break;
-            }
-        }
-
-        if (!futureHitbox.overlaps(player.getHitbox())&& !colliding) {
+        if (!futureHitbox.overlaps(player.getHitbox())) {
             position.x = nextX;
             position.y = nextY;
         }

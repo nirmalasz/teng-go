@@ -84,7 +84,9 @@ public class MainMenuScreen implements Screen {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void show() {}
+    @Override public void show() {
+        GameManager.getInstance().getBGMManager().play("menumusic", true, "mp3");
+    }
     @Override public void hide() {}
     @Override public void pause() {}
     @Override public void resume() {}

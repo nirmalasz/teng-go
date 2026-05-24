@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.badlogic.gdx.Game;
+import com.tenggo.frontend.core.GameManager;
 import com.tenggo.frontend.screen.DeathScreen;
 import com.tenggo.frontend.screen.MainMenuScreen;
 
@@ -26,5 +27,6 @@ public class TengGoGame extends Game {
     @Override
     public void dispose() {
         super.dispose();
+        GameManager.getInstance().getBGMManager().dispose();
     }
 }

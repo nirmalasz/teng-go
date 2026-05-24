@@ -15,6 +15,7 @@ public class GameManager {
     private GameState currentState;
     // private LevelManager levelManager;
     private BackendService backendService;
+    private BGMManager BGMManager;
     private String currentPlayerId;
     private int coinsCollected = 0;
     private int score = 0;
@@ -35,6 +36,7 @@ public class GameManager {
     private GameManager(){
         // initialize game state, level manager, backend service, etc.
         backendService = new BackendService();
+        BGMManager = new BGMManager();
     }
 
     public static GameManager getInstance(){
@@ -42,6 +44,10 @@ public class GameManager {
             instance = new GameManager();
         }
         return instance;
+    }
+
+    public BGMManager getBGMManager() {
+        return BGMManager;
     }
 
     public void changeState(GameState newState){
