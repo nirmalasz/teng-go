@@ -20,9 +20,9 @@ gwt {
 
   // Needs to be in front of "modules" below.
   src = files(file('src/main/java'), project(":core").file('src/main/java'))
-  modules += ["com.tenggo.frontend.GdxDefinition"]
+  modules += ["com.tenggo.frontend.gwt.GdxDefinition"]
   devModules += ["com.tenggo.frontend.GdxDefinitionSuperdev"]
-  project.webAppDirName = "webapp"
+  project.webAppDirName = "Teng-Go"
 
   compiler.strict = true
   compiler.disableCastChecking = true
@@ -161,3 +161,11 @@ java.targetCompatibility = JavaVersion.VERSION_11
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ["src/main/java"]
+    }
+  }
+}

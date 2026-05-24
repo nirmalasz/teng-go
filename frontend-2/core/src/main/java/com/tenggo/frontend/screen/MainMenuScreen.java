@@ -52,15 +52,18 @@ public class MainMenuScreen implements Screen {
 
                 GameManager.getInstance().registerPlayer(username, (success, message) -> {
                     if (success) {
-                        game.setScreen(new PreparationScreen(game));
+                        Gdx.app.postRunnable(() -> {
+                            game.setScreen(new PreparationScreen(game));
+                        });
                     } else {
-                        Dialog dialog = new Dialog("Registration Failed", skin) {
-                            protected void result(Object object) {
-                            }
-                        };
-                        dialog.text(message);
-                        dialog.button("OK");
-                        dialog.show(stage);
+                        Gdx.app.postRunnable(() -> {
+                            Dialog dialog = new Dialog("Registration Failed", skin) {
+                                protected void result(Object object) {}
+                            };
+                            dialog.text(message);
+                            dialog.button("OK");
+                            dialog.show(stage);
+                        });
                     }
                 });
             }
