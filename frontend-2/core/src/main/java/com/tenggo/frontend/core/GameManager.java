@@ -1,8 +1,11 @@
 package com.tenggo.frontend.core;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.tenggo.frontend.achievement.Achievement;
+import com.tenggo.frontend.achievement.AchievementManager;
 import com.tenggo.frontend.states.GameState;
 import com.tenggo.frontend.states.MenuState;
 
@@ -92,10 +95,93 @@ public class GameManager {
                 }
                 @Override
                 public void onError(String error) {
-                    Gdx.app.error("PLAYER STATS",error);
+                    Gdx.app.error("PLAYER STATS ERROR",error);
                 }
             }
         );
+    }
+
+    public void unlockAchievement(String currentPlayerId, String achievementId) {
+        backendService.unlockAchievement(currentPlayerId, achievementId, new BackendService.RequestCallback() {
+            @Override
+            public void onSuccess(String response) {
+                try {
+                    JsonValue parseResult = new JsonReader().parse(response);
+                    String playerAchievementId = parseResult.getString("playerAchievementId");
+                    Gdx.app.log("ACHIEVEMENT UNLOCKED", "Achievement ID: " + playerAchievementId);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Gdx.app.error("ACHIEVEMENT ERROR", error);
+            }
+        });
+    }
+
+    public interface UnlockedFetchCallback {
+        void onSuccess(Array<String> unlockedAchievementID);
+        void onError(String error);
+    }
+
+    public void fetchUnlockedAchievements(
+        final UnlockedFetchCallback callback) {
+        backendService.getPlayerAchievements(currentPlayerId, new BackendService.RequestCallback() {
+            @Override
+            public void onSuccess(String response) {
+                try {
+                    JsonValue parseResult = new JsonReader().parse(response);
+                    JsonValue achievementsArray = parseResult.has("achievements") ? parseResult.get("achievements") : parseResult;
+
+                    Array<String> unlockedIDs = new Array<>();
+
+                    for (JsonValue achievementJson : achievementsArray) {
+                        String id = achievementJson.has("achievementId") ?
+                            achievementJson.getString("achievementId") :
+                            achievementJson.getString("achievement_id");
+
+                        unlockedIDs.add(id);
+                    }
+
+                    Gdx.app.postRunnable(() -> callback.onSuccess(unlockedIDs));
+
+                } catch (Exception e) {
+                    Gdx.app.postRunnable(() -> callback.onError(e.getMessage()));
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Gdx.app.postRunnable(() -> callback.onError(error));
+            }
+        });
+    }
+
+    public void unlockAchievement(String achievementId){
+        if(currentPlayerId == null){
+            Gdx.app.log("ERROR", "Cannot unlock achievement, Player ID is missing");
+            return;
+        }
+
+        backendService.unlockAchievement(currentPlayerId, achievementId, new BackendService.RequestCallback() {
+            @Override
+            public void onSuccess(String response) {
+                try {
+                    JsonValue parseResult = new JsonReader().parse(response);
+                    String playerAchievementId = parseResult.getString("playerAchievementId");
+                    Gdx.app.log("ACHIEVEMENT UNLOCKED", "Achievement ID: " + playerAchievementId);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Gdx.app.error("ACHIEVEMENT UNLOCK ERROR", error);
+            }
+        });
     }
 
     public String getCurrentPlayerId() {

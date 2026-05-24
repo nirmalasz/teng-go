@@ -61,11 +61,28 @@ public class BackendService {
         sendRequest(request, callback);
     }
 
+    public void unlockAchievement(String playerId, String achievementId, RequestCallback callback) {
+        String json = String.format(
+            "{\"playerId\":\"%s\",\"achievementId\":\"%s\"}",
+            playerId, achievementId
+        );
+
+        HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
+        Net.HttpRequest request = requestBuilder.newRequest()
+            .method(Net.HttpMethods.POST)
+            .url(BASE_URL + "/player-achievements")
+            .header("Content-Type", "application/json")
+            .content(json)
+            .build();
+
+        sendRequest(request, callback);
+    }
+
     public void getPlayerAchievements(String playerId, RequestCallback callback) {
         HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
         Net.HttpRequest request = requestBuilder.newRequest()
             .method(Net.HttpMethods.GET)
-            .url(BASE_URL + "/player-achievements/" + "/player/" + playerId)
+            .url(BASE_URL + "/player-achievements/" + "player/" + playerId)
             .build();
 
         sendRequest(request, callback);

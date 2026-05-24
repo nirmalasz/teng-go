@@ -26,7 +26,6 @@ public class AchievementScreen implements Screen {
         this.game = game;
         this.stage = new Stage(new ScreenViewport());
 
-        Array<Achievement> achievements = achievementManager.getAchievements();
 
 
         GameManager.getInstance().changeState(new AchievementState());
@@ -38,40 +37,44 @@ public class AchievementScreen implements Screen {
         Table table = new Table();
         table.setFillParent(true);
 
-        for (Achievement achievement : achievements) {
-            String status = achievement.isUnlocked() ? "[UNLOCKED]" : "[LOCKED]";
-            Label label = new Label(
-                status + " " + achievement.getTitle() + ": " + achievement.getDescription()
-                + achievement.getReward()
-                , skin
-            );
-            table.add(label).padBottom(15);
-            table.row();
-        }
-
-        table.row();
-
         Window achievementWindow = new Window("Achievement List", skin);
-        achievementWindow.add(new Label("First Blood [LOCKED]", skin))
-            .padBottom(15);;
-        achievementWindow.row();
-        achievementWindow.add(new Label("Karl Marx Chosen [LOCKED]", skin))
-            .padBottom(15);
-
-        achievementWindow.row();
-        achievementWindow.add(new Label("Ruthless Killer [LOCKED]", skin))
-            .padBottom(15);;
-        achievementWindow.row();
-        achievementWindow.add(new Label("Temporary Escape [LOCKED]", skin))
-            .padBottom(15);;
-        achievementWindow.row();
+        Label loadingLabel = new Label("Fetching from server...", skin);
+        achievementWindow.add(loadingLabel).pad(20);
         achievementWindow.pack();
 
+        GameManager.getInstance().fetchUnlockedAchievements(
+            new GameManager.UnlockedFetchCallback() {
+                @Override
+                public void onSuccess(Array<String> unlockedAchievementID) {
+                    Array<Achievement> masterList = AchievementManager.getAchievements();
+                    achievementWindow.clearChildren();
 
+                    for(Achievement achievement: masterList){
+                        if (unlockedAchievementID.contains(achievement.getID(), false)) {
+                            achievement.setUnlocked(true);
+                        }
+                        String status = achievement.isUnlocked() ? "[UNLOCKED]" : "[LOCKED]";
+                        Label label = new Label(
+                            status + " " + achievement.getTitle() + ": " + achievement.getDescription() + " " + achievement.getReward(),
+                            skin
+                        );
+                        label.setWrap(true);
+                        achievementWindow.add(label).width(500).padBottom(15);
+                        achievementWindow.row();
+                    }
+                    achievementWindow.pack();
+                }
+
+                @Override
+                public void onError(String error) {
+                    achievementWindow.clearChildren();
+                    achievementWindow.add(new Label("Failed to load: " + error, skin)).pad(20);
+                    achievementWindow.pack();
+                }
+            });
 
 
         TextButton backButton = new TextButton("Back",skin);
-
         backButton.addListener(event -> {
             if (!backButton.isPressed()) {
                 return false;
@@ -82,12 +85,13 @@ public class AchievementScreen implements Screen {
             if(currentScreen!=null) {
                 currentScreen.dispose();
             }
-
             return true;
         });
+
         table.add(achievementWindow).padBottom(30);
         table.row();
         table.add(backButton).width(200);
+
         stage.addActor(table);
     }
 
@@ -116,5 +120,6 @@ public class AchievementScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        batch.dispose();
     }
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.tenggo.frontend.TengGoGame;
+import com.tenggo.frontend.achievement.AchievementManager;
 import com.tenggo.frontend.command.*;
 import com.tenggo.frontend.core.GameManager;
 import com.tenggo.frontend.core.GameStats;
@@ -170,6 +171,7 @@ public class GameScreen implements Screen {
                 GameManager.getInstance().setHighestLevelReached(stage);
             }
             if (stage >= 5){
+                AchievementManager.checkAndSyncAchievement();
                 GameManager.getInstance().endGame(stage);
                 Screen currentScreen = game.getScreen();
                 game.setScreen(new WinScreen(game));
@@ -190,6 +192,7 @@ public class GameScreen implements Screen {
             if (stage > GameManager.getInstance().getHighestLevelReached()) {
                 GameManager.getInstance().setHighestLevelReached(stage);
             }
+            AchievementManager.checkAndSyncAchievement();
             GameManager.getInstance().endGame(stage);
             Screen currentScreen = game.getScreen();
             game.setScreen(new DeathScreen(game));
