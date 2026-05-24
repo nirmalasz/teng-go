@@ -5,8 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.tenggo.frontend.TengGoGame;
+import com.tenggo.frontend.achievement.AchievementManager;
 import com.tenggo.frontend.command.*;
 import com.tenggo.frontend.core.GameManager;
 import com.tenggo.frontend.core.GameStats;
@@ -23,10 +29,20 @@ import com.tenggo.frontend.observer.PlayerHpObserver;
 
 
 
+
 public class GameScreen implements Screen {
+
+    private BitmapFont font;
+    private PlayerHpObserver hpObserver;
+
+    private boolean isPaused = false;
 
     private final TengGoGame game;
     private ShapeRenderer shapeRenderer;
+    private SpriteBatch batch;
+    private Texture arenaBackground;
+    private Rectangle playArea;
+
     private Player player;
     private Array<Enemy> enemies;
 
@@ -53,20 +69,34 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         System.out.println("Gameplay Started");
+        GameManager.getInstance().getBGMManager().play("battlemusic", true, "ogg");
         shapeRenderer = new ShapeRenderer();
 
-        bulletPool = new BulletPool(20);
+        batch = new SpriteBatch();
+        arenaBackground = new Texture(Gdx.files.internal("bg-battle.png"));
 
+        playArea = new Rectangle(125, 80, 780, 540);
+
+        player.setX(playArea.x + playArea.width / 2);
+        player.setY(playArea.y + playArea.height / 2);
+
+        bulletPool = new BulletPool(20);
         enemies = new Array<>();
 
         for (int i = 0; i < stage + 1; i++) {
-            enemies.add(new Enemy(500 + i * 30,300,new MeleeStrategy()));
+            float rx = MathUtils.random(playArea.x, playArea.x + playArea.width - 50);
+            float ry = MathUtils.random(playArea.y, playArea.y + playArea.height - 50);
+            enemies.add(new Enemy(rx, ry, new MeleeStrategy()));
         }
         if (stage >= 2) {
-            enemies.add(new Enemy(600,400,new RangedStrategy(bulletPool)));
+            float rx = MathUtils.random(playArea.x, playArea.x + playArea.width - 50);
+            float ry = MathUtils.random(playArea.y, playArea.y + playArea.height - 50);
+            enemies.add(new Enemy(rx, ry, new RangedStrategy(bulletPool)));
         }
         if (stage >= 3) {
-            enemies.add(new Enemy(700,350,new RushStrategy()));
+            float rx = MathUtils.random(playArea.x, playArea.x + playArea.width - 50);
+            float ry = MathUtils.random(playArea.y, playArea.y + playArea.height - 50);
+            enemies.add(new Enemy(rx, ry, new RushStrategy()));
         }
 
         gameStats = new GameStats();
@@ -77,12 +107,13 @@ public class GameScreen implements Screen {
             new MoveDownCommand(player),
             new MoveLeftCommand(player),
             new MoveRightCommand(player),
-            new AttackCommand(player, enemies)
+            new AttackCommand(player, enemies),
+            new DashCommand(player)
         );
 
-        player.addObserver(
-            new PlayerHpObserver()
-        );
+        hpObserver = new PlayerHpObserver();
+        player.addObserver(hpObserver);
+        font = new com.badlogic.gdx.graphics.g2d.BitmapFont();
     }
 
     @Override
@@ -90,25 +121,33 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            isPaused = !isPaused;
+        }
+
+        if(!isPaused){
         GameManager.getInstance().update(delta);
         inputHandler.handleInput(delta);
 
         player.update(delta);
+        keepInsideArena(player);
 
         for (int i = 0; i < enemies.size; i++) {
             Enemy enemy = enemies.get(i);
             enemy.update(delta, player, enemies);
-
-            if (enemy.getHitbox()
-                .overlaps(player.getHitbox())) {
-                player.takeDamage(10);
-            }
+            keepInsideArena(enemy);
+//            if (enemy.getHitbox()
+//                .overlaps(player.getHitbox())) {
+//                player.takeDamage(10);
+//            }
         }
 
         for (int i = enemies.size - 1; i >= 0; i--) {
             if (enemies.get(i).isDead()) {
                 gameStats.addEnemyKill();
                 gameStats.addCoins(10);
+                GameManager.getInstance().addCoins(10);
+                GameManager.getInstance().addScore(100);
                 enemies.removeIndex(i);
             }
         }
@@ -121,13 +160,19 @@ public class GameScreen implements Screen {
                 bullet.deactivate();
             }
         }
+        }
+
+        batch.begin();
+        batch.draw(arenaBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        player.render(batch);
+        for (Enemy enemy : enemies) {
+            enemy.render(batch);
+        }
+        batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        player.render(shapeRenderer);
-        for (Enemy enemy : enemies) {
-            enemy.render(shapeRenderer);
-        }
+        shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 0.8f);
+        shapeRenderer.rect(108, 720, 100, 30);
         for (int i = 0; i < bulletPool.getBullets().size; i++) {
             bulletPool.getBullets()
                 .get(i)
@@ -136,17 +181,100 @@ public class GameScreen implements Screen {
 
         shapeRenderer.end();
 
+        batch.begin();
+        String hpText = "HP: " + hpObserver.getCurrentHp();
+        font.draw(batch, hpText, 130, 740);
+
+        if (isPaused) {
+            font.draw(batch, "PAUSED - PRESS ESC TO RESUME", 400, 400);
+        }
+
+        batch.end();
+
+
         if (enemies.size == 0) {
-            game.setScreen(new BlessingScreen(game,player,stage + 1));
+            if (stage > GameManager.getInstance().getHighestLevelReached()) {
+                GameManager.getInstance().setHighestLevelReached(stage);
+            }
+            if (stage >= 5){
+                AchievementManager.checkAndSyncAchievement();
+                GameManager.getInstance().endGame(stage);
+                Screen currentScreen = game.getScreen();
+                game.setScreen(new WinScreen(game));
+                if (currentScreen != null) {
+                    currentScreen.dispose();
+                }
+                return;
+            } else {
+                Screen currentScreen = game.getScreen();
+                game.setScreen(new BlessingScreen(game,player,stage + 1));
+                if (currentScreen != null) {
+                    currentScreen.dispose();
+                }
+            }
         }
 
         if (player.isDead()) {
+            if (stage > GameManager.getInstance().getHighestLevelReached()) {
+                GameManager.getInstance().setHighestLevelReached(stage);
+            }
+            AchievementManager.checkAndSyncAchievement();
+            GameManager.getInstance().endGame(stage);
+            Screen currentScreen = game.getScreen();
             game.setScreen(new DeathScreen(game));
+            if (currentScreen != null) {
+                currentScreen.dispose();
+            }
         }
 
         // TEMP DEBUG
         if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+            Screen currentScreen = game.getScreen();
             game.setScreen(new DeathScreen(game));
+            if (currentScreen != null) {
+                currentScreen.dispose();
+            }
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+            Screen currentScreen = game.getScreen();
+            game.setScreen(new WinScreen(game));
+            if (currentScreen != null) {
+                currentScreen.dispose();
+            }
+        }
+    }
+
+    // Checks bounds for the Player
+    private void keepInsideArena(Player player) {
+        Rectangle hitbox = player.getHitbox();
+
+        if (hitbox.x < playArea.x) {
+            player.setX(playArea.x);
+        } else if (hitbox.x + hitbox.width > playArea.x + playArea.width) {
+            player.setX(playArea.x + playArea.width - hitbox.width);
+        }
+
+        if (hitbox.y < playArea.y) {
+            player.setY(playArea.y);
+        } else if (hitbox.y + hitbox.height > playArea.y + playArea.height) {
+            player.setY(playArea.y + playArea.height - hitbox.height);
+        }
+    }
+
+    // Checks bounds for the Enemy
+    private void keepInsideArena(Enemy enemy) {
+        Rectangle hitbox = enemy.getHitbox();
+
+        if (hitbox.x < playArea.x) {
+            enemy.setX(playArea.x);
+        } else if (hitbox.x + hitbox.width > playArea.x + playArea.width) {
+            enemy.setX(playArea.x + playArea.width - hitbox.width);
+        }
+
+        if (hitbox.y < playArea.y) {
+            enemy.setY(playArea.y);
+        } else if (hitbox.y + hitbox.height > playArea.y + playArea.height) {
+            enemy.setY(playArea.y + playArea.height - hitbox.height);
         }
     }
 
@@ -156,5 +284,13 @@ public class GameScreen implements Screen {
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
-    @Override public void dispose() {}
+    @Override public void dispose() {
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+        }
+        if (batch != null) batch.dispose();
+        if (arenaBackground != null) arenaBackground.dispose();
+        Enemy.disposeTextures();
+        if (font != null) font.dispose();
+    }
 }

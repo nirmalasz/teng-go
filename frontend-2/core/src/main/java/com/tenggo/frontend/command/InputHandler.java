@@ -16,7 +16,8 @@ public class InputHandler {
         Command moveDown,
         Command moveLeft,
         Command moveRight,
-        Command attack
+        Command attack,
+        Command dash
     ) {
 
         this.moveUp = moveUp;
@@ -24,6 +25,7 @@ public class InputHandler {
         this.moveLeft = moveLeft;
         this.moveRight = moveRight;
         this.attack = attack;
+        this.dash = dash;
     }
 
     public void handleInput(float delta) {
@@ -41,8 +43,12 @@ public class InputHandler {
             moveRight.execute(delta);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             attack.execute(delta);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            dash.execute(delta);
         }
     }
 }

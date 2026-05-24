@@ -3,6 +3,8 @@ package com.tenggo.frontend.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -14,17 +16,23 @@ public class DeathScreen implements Screen {
 
     private final TengGoGame game;
     private final Stage stage;
+    private final SpriteBatch batch;
+    private final Texture backgroundTexture;
 
     public DeathScreen(TengGoGame game) {
 
         this.game = game;
         this.stage = new Stage(new ScreenViewport());
+
+        batch = new SpriteBatch();
+        backgroundTexture = new Texture("bg-tenggo-office-red.png");
+
         GameManager.getInstance()
             .changeState(new DeadState(this));
 
         Gdx.input.setInputProcessor(stage);
 
-        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        Skin skin = new Skin(Gdx.files.internal("ui/metal-ui.json"));
 
         Table table = new Table();
         table.setFillParent(true);
@@ -42,9 +50,11 @@ public class DeathScreen implements Screen {
 
             if (!retryButton.isPressed()) return false;
 
-            game.setScreen(
-                new PreparationScreen(game));
-
+            Screen currentScreen = game.getScreen();
+            game.setScreen(new PreparationScreen(game));
+            if(currentScreen != null) {
+                currentScreen.dispose();
+            }
             return true;
         });
 
@@ -57,7 +67,7 @@ public class DeathScreen implements Screen {
             return true;
         });
 
-        table.add(deadLabel).padBottom(30);
+        table.add(deadLabel).padBottom(110);
         table.row();
 
         table.add(retryButton)
@@ -76,6 +86,9 @@ public class DeathScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.3f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
 
         GameManager.getInstance().update(delta);
 
@@ -87,7 +100,9 @@ public class DeathScreen implements Screen {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void show() {}
+    @Override public void show() {
+        GameManager.getInstance().getBGMManager().play("losejingle", false, "mp3");
+    }
     @Override public void hide() {}
     @Override public void pause() {}
     @Override public void resume() {}
@@ -95,5 +110,7 @@ public class DeathScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        batch.dispose();
+        backgroundTexture.dispose();
     }
 }

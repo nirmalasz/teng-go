@@ -3,31 +3,38 @@ package com.tenggo.frontend.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tenggo.frontend.TengGoGame;
 import com.tenggo.frontend.core.GameManager;
 import com.tenggo.frontend.states.MenuState;
+import com.tenggo.frontend.ui.BackgroundRenderer;
+
 
 public class MainMenuScreen implements Screen {
     private final TengGoGame game;
     private final Stage stage;
+    private final SpriteBatch batch;
+    private Texture logoTexture;
 
     public MainMenuScreen(TengGoGame game) {
         this.game = game;
         this.stage = new Stage(new ScreenViewport());
         GameManager.getInstance()
             .changeState(new MenuState(this));
-
+        batch = new SpriteBatch();
         Gdx.input.setInputProcessor(stage);
 
-        Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        Skin skin = new Skin(Gdx.files.internal("ui/metal-ui.json"));
 
         Table table = new Table();
         table.setFillParent(true);
 
-        Label title = new Label("Teng-go!", skin);
+        Texture logoTexture = new Texture(Gdx.files.internal("logo/tenggologo.png"));
+        Image logo = new Image(logoTexture);
 
         TextField usernameField = new TextField("", skin);
 
@@ -43,11 +50,13 @@ public class MainMenuScreen implements Screen {
                 GameManager.getInstance().registerPlayer(username);
                 game.setScreen(new PreparationScreen(game));
             }
-
             return true;
         });
 
-        table.add(title).padBottom(30);
+        table.add(logo)
+            .width(400)
+            .height(200)
+            .padBottom(30);
         table.row();
 
         table.add(usernameField)
@@ -64,8 +73,8 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        BackgroundRenderer.render(batch);
         GameManager.getInstance().update(delta);
         stage.act(delta);
         stage.draw();
@@ -75,14 +84,18 @@ public class MainMenuScreen implements Screen {
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void show() {}
+    @Override public void show() {
+        GameManager.getInstance().getBGMManager().play("menumusic", true, "mp3");
+    }
     @Override public void hide() {}
     @Override public void pause() {}
     @Override public void resume() {}
 
     @Override
     public void dispose() {
+        logoTexture.dispose();
         stage.dispose();
+
     }
 
 }
