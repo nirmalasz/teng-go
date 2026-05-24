@@ -22,7 +22,7 @@ Control:
 
 ## Game Flowchart
 
-<img width="4224" height="5280" alt="image" src="https://github.com/user-attachments/assets/ab0f9ff5-89d6-4710-9fd9-c59030c01513" />
+<img width="4224" height="5280" alt="image" src="https://github.com/user-attachments/assets/25ebe0e6-4b50-4218-b6ca-bf780edbac79" />
 
 ## System Diagram
 
