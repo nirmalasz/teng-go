@@ -42,7 +42,7 @@ This project implements 6 design pattern:
 7. **Command Pattern**
 
 ## To Play the Game
-Download the exe file. And you can immediatel play it!
+Download the exe file. And you can immediatel play it! Or play it in the itch.io (link in top of this page)
 
 ## Game Assets Credit
 - character-templates-pack: https://erisesra.itch.io/character-templates-pack
