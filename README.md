@@ -1,6 +1,8 @@
 # Teng-Go!
 <img width="1020" height="757" alt="image" src="https://github.com/user-attachments/assets/d5767a1c-eba5-4a40-9fd4-ee206540a18d" />
 
+**Play directly here:** https://nirmalasz.itch.io/teng-go
+
 Teng-Go! is an action-survival-corporate game built with Java and LibGDX framework. In this rogue-like gameplay, you as the main character have to escape the Office by killing the enemies when the work time is done. But it is not that easy to defeat the enemies, so you'll have to accept blessing from Karl Marx and upgrade your stats on your Desk.
 
 Control:
