@@ -67,7 +67,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         arenaBackground = new Texture(Gdx.files.internal("bg-battle.png"));
 
-        playArea = new Rectangle(125, 80, 775, 540);
+        playArea = new Rectangle(125, 80, 725, 540);
 
         player.setX(playArea.x + playArea.width / 2);
         player.setY(playArea.y + playArea.height / 2);
@@ -123,10 +123,10 @@ public class GameScreen implements Screen {
             Enemy enemy = enemies.get(i);
             enemy.update(delta, player, enemies);
             keepInsideArena(enemy);
-            if (enemy.getHitbox()
-                .overlaps(player.getHitbox())) {
-                player.takeDamage(10);
-            }
+//            if (enemy.getHitbox()
+//                .overlaps(player.getHitbox())) {
+//                player.takeDamage(10);
+//            }
         }
 
         for (int i = enemies.size - 1; i >= 0; i--) {
@@ -151,12 +151,13 @@ public class GameScreen implements Screen {
         batch.begin();
         batch.draw(arenaBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         player.render(batch);
+        for (Enemy enemy : enemies) {
+            enemy.render(batch);
+        }
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (Enemy enemy : enemies) {
-            enemy.render(shapeRenderer);
-        }
+
         for (int i = 0; i < bulletPool.getBullets().size; i++) {
             bulletPool.getBullets()
                 .get(i)
@@ -167,7 +168,6 @@ public class GameScreen implements Screen {
 
         if (enemies.size == 0) {
             if (stage > GameManager.getInstance().getHighestLevelReached()) {
-
                 GameManager.getInstance().setHighestLevelReached(stage);
             }
             if (stage >= 5){
@@ -264,5 +264,6 @@ public class GameScreen implements Screen {
         }
         if (batch != null) batch.dispose();
         if (arenaBackground != null) arenaBackground.dispose();
+        Enemy.disposeTextures();
     }
 }

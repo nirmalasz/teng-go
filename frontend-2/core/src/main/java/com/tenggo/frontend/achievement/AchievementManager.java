@@ -119,7 +119,8 @@ public class AchievementManager {
 
                 @Override
                 public void onError(String error) {
-                    Gdx.app.error("ACHIEVEMENT_SYNC", "Failed to fetch server state. Aborting sync: " + error);
+                    Gdx.app.error("ACHIEVEMENT SYNC", "Failed to fetch server state. Aborting " +
+                        "sync: " + error);
                 }
             });
     }
