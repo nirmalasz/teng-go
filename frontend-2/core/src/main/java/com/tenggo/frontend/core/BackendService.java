@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public class BackendService {
     private static final String BASE_URL = "https://resilient-dream-production-df2c.up.railway.app/api";
-    private UUID currentPlayerId;
 
     public interface RequestCallback {
         void onSuccess(String response);
@@ -34,10 +33,12 @@ public class BackendService {
 
     public void submitScore(String playerId, int scoreValue, int coinsCollected, int stageReached,
         RequestCallback callback) {
-        String json = String.format(
-            "{\"playerId\":\"%s\",\"value\":%d,\"coinsCollected\":%d,\"levelReached\":%d}",
-            playerId, scoreValue, coinsCollected, stageReached
-        );
+        String json = "{\"playerId\":\"" + playerId +
+            "\",\"value\":" + scoreValue +
+            ",\"coinsCollected\":" + coinsCollected +
+            ",\"levelReached\":" + stageReached + "}";
+
+
 
 
         HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
@@ -62,10 +63,7 @@ public class BackendService {
     }
 
     public void unlockAchievement(String playerId, String achievementId, RequestCallback callback) {
-        String json = String.format(
-            "{\"playerId\":\"%s\",\"achievementId\":\"%s\"}",
-            playerId, achievementId
-        );
+        String json = "{\"playerId\":\"" + playerId + "\", \"achievementId\":\"" + achievementId + "\"}";
 
         HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
         Net.HttpRequest request = requestBuilder.newRequest()
