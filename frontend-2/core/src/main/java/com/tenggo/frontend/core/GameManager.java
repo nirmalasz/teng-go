@@ -70,7 +70,10 @@ public class GameManager {
         }
     }
 
-    public void registerPlayer(String username){
+    public interface RegisterCallback {
+        void onResult(boolean success, String message);
+    }
+    public void registerPlayer(String username, RegisterCallback callback){
         backendService.createPlayer(username, new BackendService.RequestCallback() {
             @Override
             public void onSuccess(String response) {
@@ -79,6 +82,7 @@ public class GameManager {
 
                     currentPlayerId = parseResult.getString("playerId");
                     Gdx.app.log("SUCCESS", "Player ID: " + currentPlayerId);
+                    callback.onResult(true, "Success");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -86,6 +90,11 @@ public class GameManager {
             @Override
             public void onError(String error) {
                 Gdx.app.log("ERROR", error);
+                if (error.contains("400")){
+                    callback.onResult(false, "Username already exists");
+                } else {
+                    callback.onResult(false, "Server Error: " + error);
+                }
             }
         });
     }

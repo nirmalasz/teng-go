@@ -10,6 +10,7 @@ public class InputHandler {
     private final Command moveLeft;
     private final Command moveRight;
     private final Command attack;
+    private final Command dash;
 
     public InputHandler(
         Command moveUp,
