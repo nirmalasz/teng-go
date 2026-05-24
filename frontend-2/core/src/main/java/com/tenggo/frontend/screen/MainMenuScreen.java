@@ -5,8 +5,10 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tenggo.frontend.TengGoGame;
 import com.tenggo.frontend.core.GameManager;
@@ -42,15 +44,26 @@ public class MainMenuScreen implements Screen {
 
         TextButton startButton = new TextButton("Start Game", skin);
 
-        startButton.addListener(event -> {
-            if (!startButton.isPressed()) return false;
-            String username = usernameField.getText();
+        startButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String username = usernameField.getText();
+                if (username.isEmpty()) return;
 
-            if (!username.isEmpty()) {
-                GameManager.getInstance().registerPlayer(username);
-                game.setScreen(new PreparationScreen(game));
+                GameManager.getInstance().registerPlayer(username, (success, message) -> {
+                    if (success) {
+                        game.setScreen(new PreparationScreen(game));
+                    } else {
+                        Dialog dialog = new Dialog("Registration Failed", skin) {
+                            protected void result(Object object) {
+                            }
+                        };
+                        dialog.text(message);
+                        dialog.button("OK");
+                        dialog.show(stage);
+                    }
+                });
             }
-            return true;
         });
 
         table.add(logo)
