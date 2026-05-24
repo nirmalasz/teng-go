@@ -41,3 +41,8 @@ This project implements 6 design pattern:
 
 ## To Play the Game
 Download the exe file. And you can immediatel play it!
+
+## Game Assets Credit
+- character-templates-pack: https://erisesra.itch.io/character-templates-pack
+- metal-ui: https://github.com/czyzby/gdx-skins/tree/master/metal
+- modern-interior: https://limezu.itch.io/moderninteriors
