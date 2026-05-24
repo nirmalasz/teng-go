@@ -128,16 +128,6 @@ public class Player implements Subject {
         position.x += dx;
         position.y += dy;
 
-        // screen bounds
-        if (position.x < 0) position.x = 0;
-        if (position.y < 0) position.y = 0;
-
-        if (position.x > 800 - width)
-            position.x = 800 - width;
-
-        if (position.y > 600 - height)
-            position.y = 600 - height;
-
         if (dx != 0 || dy != 0) {
             facingDirection.set(dx, dy).nor();
             if (dx < 0) {
@@ -193,10 +183,10 @@ public class Player implements Subject {
         isAttacking = true;
         stateTime = 0f;
         attackHitbox.set(
-            position.x - 8,
-            position.y - 8,
-            width + 16,
-            height + 16
+            position.x - 24f,
+            position.y - 24f,
+            width + 48f,
+            height + 48f
         );
 
         return true;
@@ -220,17 +210,8 @@ public class Player implements Subject {
         }
 
         position.x += facingDirection.x * dashDistance;
-
         position.y += facingDirection.y * dashDistance;
 
-        // bounds
-        if (position.x < 0) position.x = 0;
-        if (position.y < 0) position.y = 0;
-
-        if (position.x > 800 - width)
-            position.x = 800 - width;
-        if (position.y > 600 - height)
-            position.y = 600 - height;
 
         hitbox.setPosition(position.x, position.y);
 

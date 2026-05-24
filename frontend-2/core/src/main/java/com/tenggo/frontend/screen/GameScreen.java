@@ -67,7 +67,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         arenaBackground = new Texture(Gdx.files.internal("bg-battle.png"));
 
-        playArea = new Rectangle(125, 80, 725, 540);
+        playArea = new Rectangle(125, 80, 780, 540);
 
         player.setX(playArea.x + playArea.width / 2);
         player.setY(playArea.y + playArea.height / 2);
