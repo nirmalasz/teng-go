@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -28,7 +29,13 @@ import com.tenggo.frontend.observer.PlayerHpObserver;
 
 
 
+
 public class GameScreen implements Screen {
+
+    private BitmapFont font;
+    private PlayerHpObserver hpObserver;
+
+    private boolean isPaused = false;
 
     private final TengGoGame game;
     private ShapeRenderer shapeRenderer;
@@ -104,9 +111,9 @@ public class GameScreen implements Screen {
             new DashCommand(player)
         );
 
-        player.addObserver(
-            new PlayerHpObserver()
-        );
+        hpObserver = new PlayerHpObserver();
+        player.addObserver(hpObserver);
+        font = new com.badlogic.gdx.graphics.g2d.BitmapFont();
     }
 
     @Override
@@ -114,6 +121,11 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            isPaused = !isPaused;
+        }
+
+        if(!isPaused){
         GameManager.getInstance().update(delta);
         inputHandler.handleInput(delta);
 
@@ -148,6 +160,7 @@ public class GameScreen implements Screen {
                 bullet.deactivate();
             }
         }
+        }
 
         batch.begin();
         batch.draw(arenaBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -158,7 +171,8 @@ public class GameScreen implements Screen {
         batch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
+        shapeRenderer.setColor(0.1f, 0.1f, 0.1f, 0.8f);
+        shapeRenderer.rect(108, 720, 100, 30);
         for (int i = 0; i < bulletPool.getBullets().size; i++) {
             bulletPool.getBullets()
                 .get(i)
@@ -166,6 +180,17 @@ public class GameScreen implements Screen {
         }
 
         shapeRenderer.end();
+
+        batch.begin();
+        String hpText = "HP: " + hpObserver.getCurrentHp();
+        font.draw(batch, hpText, 130, 740);
+
+        if (isPaused) {
+            font.draw(batch, "PAUSED - PRESS ESC TO RESUME", 400, 400);
+        }
+
+        batch.end();
+
 
         if (enemies.size == 0) {
             if (stage > GameManager.getInstance().getHighestLevelReached()) {
@@ -266,5 +291,6 @@ public class GameScreen implements Screen {
         if (batch != null) batch.dispose();
         if (arenaBackground != null) arenaBackground.dispose();
         Enemy.disposeTextures();
+        if (font != null) font.dispose();
     }
 }
