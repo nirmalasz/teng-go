@@ -37,6 +37,7 @@ This project implements 6 design pattern:
 4. **Strategy Pattern**
 5. **Facade Pattern** 
 6. **Object Pool Pattern**
+7. **Command Pattern**
 
 ## To Play the Game
 Download the exe file. And you can immediatel play it!
